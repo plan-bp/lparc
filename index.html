@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Adicione um lembrete do vencimento do boleto do seu acordo ao calendário.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#203b63">
+  <title>Lembrete de vencimento do boleto</title>
+  <style>
+    :root {
+      /* Paleta inspirada na identidade visual da ARC4 */
+      --azul: #203b63;
+      --azul-escuro: #162c4c;
+      --laranja: #f7a51b;
+      --laranja-hover: #e99510;
+      --texto: #21334d;
+      --secundaria: #67768a;
+      --fundo: #f1f5fa;
+      --borda: #e4eaf2;
+      --erro: #b91c1c;
+      --aviso: #92400e;
+      --aviso-fundo: #fffbeb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 26px 18px;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--texto);
+      background: linear-gradient(160deg, #f9fbfe 0%, var(--fundo) 100%);
+    }
+
+    .pagina {
+      width: 100%;
+      min-height: calc(100vh - 52px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+    }
+
+    .card {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      max-width: 456px;
+      padding: 36px 28px 30px;
+      text-align: center;
+      background: #fff;
+      border: 1px solid var(--borda);
+      border-radius: 22px;
+      box-shadow: 0 18px 50px rgba(22, 44, 76, .10);
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 0;
+      height: 5px;
+      background: var(--laranja);
+    }
+
+    /* A marca enviada combina elementos claros e laranja: fundo escuro
+       garante que "ARC4" fique legível. O formato horizontal evita
+       que a arte seja reduzida a uma miniatura dentro de um quadrado. */
+    .icone {
+      width: 210px;
+      height: 92px;
+      margin: 0 auto 19px;
+      padding: 7px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 20px;
+      background: var(--azul-escuro);
+      border: 1px solid rgba(247, 165, 27, .44);
+      box-shadow: 0 9px 22px rgba(22, 44, 76, .17);
+    }
+
+    .icone img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      color: var(--azul-escuro);
+      font-size: 26px;
+      line-height: 1.2;
+      letter-spacing: -.35px;
+    }
+
+    .descricao {
+      margin: 0 auto;
+      max-width: 360px;
+      color: var(--secundaria);
+      font-size: 16px;
+      line-height: 1.55;
+    }
+
+    .data-label {
+      margin-top: 30px;
+      color: var(--secundaria);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .65px;
+      text-transform: uppercase;
+    }
+
+    .data {
+      margin-top: 9px;
+      color: var(--azul);
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -.3px;
+    }
+
+    .botao {
+      width: 100%;
+      min-height: 56px;
+      margin-top: 28px;
+      padding: 15px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.3;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background .18s ease, transform .18s ease, box-shadow .18s ease;
+    }
+
+    .botao:focus-visible {
+      outline: 3px solid var(--azul);
+      outline-offset: 4px;
+    }
+
+    .botao-calendario {
+      background: var(--laranja);
+      color: var(--azul-escuro);
+      box-shadow: 0 6px 18px rgba(247, 165, 27, .20);
+      animation: pulsar 2.3s ease-in-out infinite;
+    }
+
+    .botao-calendario:hover {
+      background: var(--laranja-hover);
+      transform: translateY(-2px);
+    }
+
+    @keyframes pulsar {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(247, 165, 27, .46); }
+      55% { box-shadow: 0 0 0 12px rgba(247, 165, 27, 0); }
+    }
+
+    .apoio-titulo {
+      margin: 26px 0 0;
+      color: var(--azul-escuro);
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .botao-whatsapp {
+      margin-top: 11px;
+      min-height: 52px;
+      background: #fff;
+      color: var(--azul);
+      border-color: #cbd6e5;
+      font-size: 15px;
+    }
+
+    .botao-whatsapp:hover {
+      background: #f1f6fc;
+      transform: translateY(-1px);
+    }
+
+    .botao-whatsapp svg {
+      width: 21px;
+      height: 21px;
+      flex: 0 0 21px;
+      fill: #20a85a;
+    }
+
+    .orientacao, .aviso {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.55;
+      text-align: left;
+    }
+
+    .orientacao { background: #eef4fc; color: var(--azul-escuro); }
+    .aviso { background: var(--aviso-fundo); color: var(--aviso); }
+
+    .informacao {
+      margin: 23px 0 0;
+      color: var(--secundaria);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .erro {
+      margin-top: 24px;
+      padding: 16px;
+      border-radius: 10px;
+      background: #fef2f2;
+      color: var(--erro);
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .rodape {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      max-width: 456px;
+      min-height: 58px;
+      padding: 10px 24px;
+      background: var(--azul-escuro);
+      border-radius: 15px;
+    }
+
+    .rodape img {
+      display: block;
+      width: 94px;
+      max-width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .oculto { display: none; }
+
+    @media (max-width: 380px) {
+      .card { padding: 31px 20px 25px; }
+      h1 { font-size: 23px; }
+      .data { font-size: 29px; }
+      .botao { font-size: 15px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .botao-calendario { animation: none; }
+      .botao { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="pagina">
+    <main class="card">
+      <div class="icone">
+        <img
+          src="https://lpbp.me/static/uploads/fa421dc28fbf7f7a4218526a534db5e9.webp"
+          alt="Ícone de lembrete de vencimento"
+          width="180"
+          height="76"
+        >
+      </div>
+
+      <h1>Lembrete de vencimento</h1>
+      <p class="descricao">Adicione um lembrete do vencimento do boleto do seu acordo ao calendário.</p>
+
+      <section id="resultado" class="oculto" aria-label="Dados do vencimento">
+        <div class="data-label">Data do vencimento</div>
+        <div id="dataExibicao" class="data"></div>
+
+        <a id="botaoCalendario" class="botao botao-calendario" href="#">Adicionar ao calendário</a>
+
+        <p class="apoio-titulo">Não consegue pagar ou teve algum problema?</p>
+        <a
+          id="botaoWhatsApp"
+          class="botao botao-whatsapp"
+          href="https://api.whatsapp.com/send?phone=551152532687&amp;text=Quero%20informa%C3%A7%C3%B5es%20sobre%20o%20meu%20acordo."
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Preciso de ajuda com meu acordo. Conversar pelo WhatsApp"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20.52 3.48A11.86 11.86 0 0 0 12.05 0C5.5 0 .16 5.33.16 11.89c0 2.1.55 4.16 1.61 5.98L.06 24l6.29-1.65a11.86 11.86 0 0 0 5.67 1.44h.01c6.56 0 11.9-5.34 11.91-11.9a11.84 11.84 0 0 0-3.42-8.41ZM12.03 21.8a9.85 9.85 0 0 1-5.04-1.38l-.36-.21-3.74.98 1-3.64-.24-.37A9.82 9.82 0 0 1 2.14 12c0-5.44 4.43-9.87 9.88-9.87a9.81 9.81 0 0 1 6.99 2.9 9.81 9.81 0 0 1 2.88 6.99c-.01 5.45-4.44 9.88-9.86 9.88Zm5.42-7.39c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.95 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.67-2.06-.17-.3-.02-.46.13-.61.14-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.61-.92-2.2-.24-.58-.48-.5-.67-.5l-.57-.01c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.22 3.07c.15.2 2.1 3.2 5.09 4.48.71.31 1.27.49 1.71.63.72.23 1.37.2 1.89.12.58-.09 1.76-.72 2.01-1.41.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35Z"/>
+          </svg>
+          Preciso de ajuda com meu acordo
+        </a>
+
+        <div id="orientacaoIOS" class="orientacao oculto">
+          <strong>Como adicionar no iPhone:</strong><br>
+          Abra esta página no Safari, toque no botão e confirme a inclusão quando o evento for exibido.
+        </div>
+
+        <div id="avisoVencido" class="aviso oculto">
+          Atenção: esta data já passou. O lembrete será criado com a data original informada.
+        </div>
+
+        <p class="informacao">Esta página cria apenas um lembrete. Ela não realiza pagamentos nem altera o vencimento do boleto.</p>
+      </section>
+
+      <section id="mensagemErro" class="erro oculto" role="alert">
+        Não foi possível identificar a data. Use o endereço no formato #AAMMDD, por exemplo: #261030.
+      </section>
+    </main>
+
+    <footer class="rodape" aria-label="Bellinati Perez">
+      <img
+        src="https://portal.bellinati.com.br/assets/logo-DXK3GJ-z.png"
+        alt="Bellinati Perez"
+        width="94"
+        height="37"
+      >
+    </footer>
+  </div>
+
+  <script>
+    "use strict";
+
+    const TITULO_EVENTO = "Vencimento do boleto do acordo ARC4";
+    const DESCRICAO_EVENTO = "Lembrete da data de vencimento do boleto do seu acordo com a ARC4.";
+    let urlArquivoICS = null;
+
+    function doisDigitos(numero) {
+      return String(numero).padStart(2, "0");
+    }
+
+    function obterCodigoDaUrl() {
+      const hash = window.location.hash.slice(1).trim();
+      if (hash) return hash;
+      return (new URLSearchParams(window.location.search).get("d") || "").trim();
+    }
+
+    function interpretarData(codigo) {
+      if (!/^\d{6}$/.test(codigo)) return null;
+      const ano = 2000 + Number(codigo.slice(0, 2));
+      const mes = Number(codigo.slice(2, 4));
+      const dia = Number(codigo.slice(4, 6));
+      const teste = new Date(ano, mes - 1, dia, 12, 0, 0);
+      if (teste.getFullYear() !== ano || teste.getMonth() !== mes - 1 || teste.getDate() !== dia) return null;
+      return { ano, mes, dia };
+    }
+
+    function dataCompacta(data) {
+      return String(data.ano) + doisDigitos(data.mes) + doisDigitos(data.dia);
+    }
+
+    function diaSeguinte(data) {
+      const seguinte = new Date(data.ano, data.mes - 1, data.dia + 1, 12, 0, 0);
+      return { ano: seguinte.getFullYear(), mes: seguinte.getMonth() + 1, dia: seguinte.getDate() };
+    }
+
+    function dataBrasileira(data) {
+      return doisDigitos(data.dia) + "/" + doisDigitos(data.mes) + "/" + data.ano;
+    }
+
+    function ehIOS() {
+      const ua = navigator.userAgent || "";
+      return /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    }
+
+    function ehMac() {
+      return !ehIOS() && (/Mac/i.test(navigator.platform || "") || /Macintosh/i.test(navigator.userAgent || ""));
+    }
+
+    function urlGoogle(data) {
+      const parametros = new URLSearchParams({
+        action: "TEMPLATE",
+        text: TITULO_EVENTO,
+        dates: dataCompacta(data) + "/" + dataCompacta(diaSeguinte(data)),
+        details: DESCRICAO_EVENTO,
+        ctz: "America/Sao_Paulo"
+      });
+      return "https://calendar.google.com/calendar/render?" + parametros.toString();
+    }
+
+    function dobrarLinhaICS(linha) {
+      const codificador = new TextEncoder();
+      let resultado = "";
+      let tamanhoLinha = 0;
+      for (const caractere of linha) {
+        const tamanho = codificador.encode(caractere).length;
+        if (tamanhoLinha + tamanho > 75) {
+          resultado += "\r\n ";
+          tamanhoLinha = 1;
+        }
+        resultado += caractere;
+        tamanhoLinha += tamanho;
+      }
+      return resultado;
+    }
+
+    function conteudoICS(data) {
+      const inicio = dataCompacta(data);
+      const fim = dataCompacta(diaSeguinte(data));
+      const agora = new Date();
+      const carimbo = agora.getUTCFullYear() + doisDigitos(agora.getUTCMonth() + 1) + doisDigitos(agora.getUTCDate()) + "T" + doisDigitos(agora.getUTCHours()) + doisDigitos(agora.getUTCMinutes()) + doisDigitos(agora.getUTCSeconds()) + "Z";
+      return [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//Lembrete de Vencimento//PT-BR",
+        "CALSCALE:GREGORIAN",
+        "METHOD:PUBLISH",
+        "BEGIN:VEVENT",
+        "UID:arc4-boleto-" + inicio,
+        "DTSTAMP:" + carimbo,
+        "DTSTART;VALUE=DATE:" + inicio,
+        "DTEND;VALUE=DATE:" + fim,
+        "SUMMARY:" + TITULO_EVENTO,
+        "DESCRIPTION:" + DESCRICAO_EVENTO,
+        "TRANSP:TRANSPARENT",
+        "STATUS:CONFIRMED",
+        "BEGIN:VALARM",
+        "TRIGGER;RELATED=START:PT9H",
+        "ACTION:DISPLAY",
+        "DESCRIPTION:" + TITULO_EVENTO,
+        "END:VALARM",
+        "END:VEVENT",
+        "END:VCALENDAR",
+        ""
+      ].map(dobrarLinhaICS).join("\r\n");
+    }
+
+    function criarArquivoICS(data) {
+      const arquivo = new Blob([conteudoICS(data)], {
+        type: "text/calendar;charset=utf-8"
+      });
+      return URL.createObjectURL(arquivo);
+    }
+
+    function configurarGoogle(botao, data, texto) {
+      botao.textContent = texto;
+      botao.href = urlGoogle(data);
+      botao.target = "_blank";
+      botao.rel = "noopener noreferrer";
+      botao.removeAttribute("download");
+    }
+
+    function configurarApple(botao, data, texto) {
+      botao.textContent = texto;
+      if (!urlArquivoICS) urlArquivoICS = criarArquivoICS(data);
+      botao.href = urlArquivoICS;
+      botao.setAttribute("download", "vencimento-boleto.ics");
+      botao.removeAttribute("target");
+      botao.removeAttribute("rel");
+    }
+
+    function configurarBotoes(data) {
+      const principal = document.getElementById("botaoCalendario");
+      if (ehIOS()) {
+        configurarApple(principal, data, "Adicionar ao Calendário do iPhone");
+        document.getElementById("orientacaoIOS").classList.remove("oculto");
+      } else if (ehMac()) {
+        configurarApple(principal, data, "Adicionar ao Calendário da Apple");
+      } else {
+        configurarGoogle(principal, data, "Adicionar ao Google Agenda");
+      }
+    }
+
+    function dataPassou(data) {
+      const hoje = new Date();
+      hoje.setHours(0, 0, 0, 0);
+      const vencimento = new Date(data.ano, data.mes - 1, data.dia);
+      return vencimento < hoje;
+    }
+
+    function iniciar() {
+      const data = interpretarData(obterCodigoDaUrl());
+      if (!data) {
+        document.getElementById("mensagemErro").classList.remove("oculto");
+        return;
+      }
+      document.getElementById("dataExibicao").textContent = dataBrasileira(data);
+      configurarBotoes(data);
+      if (dataPassou(data)) document.getElementById("avisoVencido").classList.remove("oculto");
+      document.getElementById("resultado").classList.remove("oculto");
+    }
+
+    iniciar();
+  </script>
+</body>
+</html>
